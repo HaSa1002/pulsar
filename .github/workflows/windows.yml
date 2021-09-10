@@ -64,16 +64,9 @@ jobs:
           cd builddir
           meson compile --verbose
       
+      # meson test does not work on Windows CI (I don't know why, so we need to register them here manually)
       - name: Run Tests
         run: |
           cd builddir
-          cd core && .\core_test.exe
-          cd ..
-          meson test --verbose
-      
-      - name: Print test output
-        if: ${{ always() }}
-        shell: bash
-        run: |
-          cat builddir/meson-logs/testlog.txt
-          
+          .\core/core_test.exe
+          .\services/native_toolkit/ntk_test.exe 
