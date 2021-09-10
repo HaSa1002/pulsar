@@ -63,12 +63,12 @@ jobs:
         run: |
           cd builddir
           meson compile --verbose
-          meson test
       
       - name: Run Tests
         shell: bash
         run: |
           cd builddir
+          core/core_test.exe
           meson test --verbose
       
       - name: Print test output
