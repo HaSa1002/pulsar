@@ -10,6 +10,11 @@ project(
 )
 
 DEPENDENCIES = []
+if meson.get_compiler('cpp').get_id() == 'msvc'
+    EXTRA_CPP_ARGS = ['-std:c++17']
+else
+    EXTRA_CPP_ARGS = []
+endif
 INCDIRS = include_directories('.', 'thirdparty')
 
 subdir('thirdparty')

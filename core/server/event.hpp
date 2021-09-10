@@ -85,13 +85,13 @@ namespace pulsar {
 		}
 
 		void emit() {
-			for (auto listener : callbacks) {
+			for (auto& listener : callbacks) {
 				listener.second();
 			}
 		}
 
 		Event<void>& operator()() {
-			for (auto listener : callbacks) {
+			for (auto& listener : callbacks) {
 				listener.second();
 			}
 			return *this;
@@ -123,31 +123,31 @@ namespace pulsar {
 				++calls;
 			});
 			CHECK_EQ(id, 0);
-			OnMessage.emit("Hello World");
+			OnMessage.emit({ "Hello World" });
 			OnMessage.disconnect(id);
-			OnMessage("garbage message"); //if someone get's called, we will get failed checks and a wrong counter
+			OnMessage({ "garbage message" }); //if someone get's called, we will get failed checks and a wrong counter
 			id = OnMessage += [&calls](const char* str) {
 				std::cout << "Hello again\n";
 				CHECK_EQ(str, "second message");
 				++calls;
 			};
-			OnMessage("second message");
+			OnMessage({ "second message" });
 			OnMessage -= id;
 			auto callback = [&calls](const char* str) {
 				CHECK_EQ(str, "third message");
 				++calls;
 			};
 			OnMessage += callback;
-			OnMessage("third message");
+			OnMessage({ "third message" });
 			OnMessage -= OnMessage.get_last_id();
-			OnMessage("fourth message"); //shouldn't call anything
+			OnMessage({ "fourth message" }); //shouldn't call anything
 			CHECK_EQ(calls, 3);
 		}
 
 		SUBCASE("Event<int, int>") {
 			Event<int, int> OnMultiply;
 			size_t calls = 0;
-			for (size_t i = 0; i < 10; i++) {
+			for (int i = 0; i < 10; i++) {
 				CHECK_EQ(OnMultiply.connect([i, &calls](int a, int b) { 
 					std::cout << "Num " << i << " resulting in " << i + a * b << "\n"; 
 					++calls; }),
