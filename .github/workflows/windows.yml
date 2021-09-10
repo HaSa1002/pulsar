@@ -65,13 +65,9 @@ jobs:
           meson compile --verbose
       
       - name: Run Tests
-        shell: bash
         run: |
           cd builddir
-          ls
-          ls -la core
-          ls -la services
-          cd core && core_test.exe
+          cd core && .\core_test.exe
           cd ..
           meson test --verbose
       
