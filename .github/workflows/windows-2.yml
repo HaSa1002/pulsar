@@ -56,6 +56,6 @@ jobs:
     - name: Prepare Build
       run: meson setup build
     - name: Run Build
-      run: meson compile -v -C build
+      run: cd build && meson compile -v
     - name: Run Test Suite
-      run: meson test -v -C build
+      run: cd build && meson test -v
