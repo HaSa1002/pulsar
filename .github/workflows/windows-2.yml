@@ -1,0 +1,61 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+env:
+  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+  BASE_BRANCH: main
+
+jobs:
+  ci-msvc:
+    name: CI with MSVC
+    runs-on: windows-latest
+
+    steps:
+    - name: Fetch Sources
+      uses: actions/checkout@v2
+    
+    - name: Prepare compiler cache
+      id: prep-ccache
+      shell: bash
+      run: |
+        mkdir -p "${CCACHE_DIR}"
+        echo "::set-output name=dir::$CCACHE_DIR"
+        echo "::set-output name=today::$(date -I)"
+        
+    - name: Load Cache
+      id: windows-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.prep-ccache.outputs.dir }}
+        key: ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+        restore-keys: |
+          ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+          ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}
+          ${{github.job}}-${{env.BASE_BRANCH}}
+      continue-on-error: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Python Dependencies
+      run: pip install meson ninja
+
+    - name: Prepare MSVC
+      uses: bus1/cabuild/action/msdevshell@v1
+      with:
+        architecture: x64
+    - name: Prepare Build
+      run: meson setup build
+    - name: Run Build
+      run: meson compile -v -C build
+    - name: Run Test Suite
+      run: meson test -v -C build
