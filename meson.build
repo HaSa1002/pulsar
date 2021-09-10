@@ -15,9 +15,10 @@ if meson.get_compiler('cpp').get_id() == 'msvc'
 else
     EXTRA_CPP_ARGS = []
 endif
-INCDIRS = include_directories('.', 'thirdparty')
+INCDIRS = include_directories('.', 'thirdparty/doctest')
 
 subdir('thirdparty')
 
 subdir('core')
 subdir('services')
+subdir('main')

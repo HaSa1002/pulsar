@@ -1,11 +1,13 @@
-#include "common.hpp"
-#include "string/string.hpp"
+#pragma once
 
 #include <functional>
 #include <map>
 #include <set>
 #include <iostream>
+#include <limits>
 
+#include "core/common.hpp"
+#include "core/string/string.hpp"
 #include "doctest.h"
 
 namespace pulsar {
