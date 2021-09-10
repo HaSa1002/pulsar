@@ -13,24 +13,16 @@ env:
   BASE_BRANCH: main
 
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: windows-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      
-      #- name: Install Ninja
-      #  id: ninja
-      #  uses: turtlesec-no/get-ninja@main
 
       - name: Setup Meson and Ninja
         run: pip3 install meson ninja

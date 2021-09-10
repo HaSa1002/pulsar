@@ -1,3 +1,3 @@
-library('doctest', 'doctest.h')
+static_library('doctest', 'doctest.h')
 
 INC_TEST = include_directories('.')
