@@ -67,5 +67,5 @@ jobs:
       - name: Run Tests
         run: |
           cd builddir
-          meson test --verbose
+          ninja test --verbose
           
