@@ -69,7 +69,9 @@ jobs:
         run: |
           cd builddir
           meson test --verbose
+      
       - name: Print test output
+        if: ${{ always() }}
         shell: bash
         run: |
           cat builddir/meson-logs/testlog.txt
