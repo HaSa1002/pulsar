@@ -4,6 +4,7 @@
 #include "server/event.hpp"
 
 int main(int argc, char** argv) {
+	std::cout << "This is my life \n";
 	doctest::Context context;
 	context.applyCommandLine(argc, argv);
 	context.setOption("no-breaks", true); 
