@@ -66,5 +66,6 @@ jobs:
       
       # meson test does not work on Windows CI (I don't know why, so we need to register them here manually)
       - name: Run Tests
+        shell: cmd
         run: |
-          cd builddir && .\core/core_test.exe && .\services/native_toolkit/ntk_test.exe 
+          cd builddir && core/core_test.exe && services/native_toolkit/ntk_test.exe 
