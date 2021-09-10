@@ -62,10 +62,11 @@ jobs:
       - name: Compilation
         run: |
           cd builddir
-          meson compile
+          meson compile --verbose
       
       - name: Run Tests
+        shell: bash
         run: |
           cd builddir
-          ninja test --verbose
+          meson test --verbose
           
