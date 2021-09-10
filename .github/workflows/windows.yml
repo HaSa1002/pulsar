@@ -28,12 +28,12 @@ jobs:
         with:
           python-version: '3.x'
       
-      - name: Install Ninja
-        id: ninja
-        uses: turtlesec-no/get-ninja@main
+      #- name: Install Ninja
+      #  id: ninja
+      #  uses: turtlesec-no/get-ninja@main
 
-      - name: Setup Meson
-        run: pip3 install --user meson
+      - name: Setup Meson and Ninja
+        run: pip3 install meson ninja
       
       - name: Prepare compiler cache
         id: prep-ccache
