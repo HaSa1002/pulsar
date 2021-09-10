@@ -68,5 +68,5 @@ jobs:
       - name: Run Tests
         shell: cmd
         run: |
-          builddir/core/core_test.exe
-          builddir/services/native_toolkit/ntk_test.exe 
+          builddir\core\core_test.exe
+          builddir\services\native_toolkit\ntk_test.exe 
