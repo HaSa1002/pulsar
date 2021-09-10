@@ -28,6 +28,10 @@ jobs:
         with:
           python-version: '3.x'
       
+      - name: Install Ninja
+        id: ninja
+        uses: turtlesec-no/get-ninja@main
+
       - name: Setup Meson
         run: pip3 install --user meson
       
@@ -39,7 +43,7 @@ jobs:
           echo "::set-output name=dir::$CCACHE_DIR"
           echo "::set-output name=today::$(date -I)"
           
-      - name: Load .scons_cache directory
+      - name: Load Cache
         id: windows-cache
         uses: actions/cache@v2
         with:
