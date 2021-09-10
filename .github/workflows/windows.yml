@@ -47,8 +47,9 @@ jobs:
             ${{github.job}}-${{env.BASE_BRANCH}}
         continue-on-error: true
       
+      # DLL's don't get copied and cause a test fail. Meson Bug?
       - name: Setup Meson
-        run: meson setup builddir #-Ddefault_library=static
+        run: meson setup builddir -Ddefault_library=static
       
       - name: Compilation
         run: |
@@ -57,10 +58,3 @@ jobs:
       
       - name: Run Tests
         run: meson test -C builddir -v
-
-      # meson test does not work on Windows CI (I don't know why, so we need to register them here manually)
-      #- name: Run Tests
-      #  shell: cmd
-      #  run: |
-      #    builddir\core\core_test.exe
-      #    builddir\services\native_toolkit\ntk_test.exe 

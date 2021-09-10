@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Meson MSVC
 
 on:
   push:
@@ -53,8 +53,9 @@ jobs:
       uses: bus1/cabuild/action/msdevshell@v1
       with:
         architecture: x64
+    # We need to use static linking, because Mesons setup for MSVC is broken and links against .lib files even though it generated .dlls
     - name: Prepare Build
-      run: meson setup build #-Ddefault_library=static
+      run: meson setup build -Ddefault_library=static
     - name: Run Build
       run: cd build && meson compile -v
     - name: Run Test Suite
