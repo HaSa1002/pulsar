@@ -49,7 +49,7 @@ jobs:
       
       - name: Setup Meson
         run: |
-          meson setup builddir
+          meson setup builddir -Dfoo:default_library=static
       
       - name: Compilation
         run: |
