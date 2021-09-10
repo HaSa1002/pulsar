@@ -65,5 +65,7 @@ jobs:
           meson compile
       
       - name: Run Tests
-        run: meson test
+        run: |
+          cd builddir
+          meson test
           
