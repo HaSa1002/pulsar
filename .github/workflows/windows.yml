@@ -48,8 +48,7 @@ jobs:
         continue-on-error: true
       
       - name: Setup Meson
-        run: |
-          meson setup builddir -Ddefault_library=static
+        run: meson setup builddir #-Ddefault_library=static
       
       - name: Compilation
         run: |
