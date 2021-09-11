@@ -1,4 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT
+#define DOCTEST_CONFIG_TREAT_CHAR_STAR_AS_STRING
 #include "doctest.h"
 #include "window.hpp"
 

@@ -1,0 +1,110 @@
+name: Windows Builds
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+env:
+  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+  BASE_BRANCH: main
+
+jobs:
+  ninja-debug:
+    name: Ninja (Debug)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Setup Meson and Ninja
+        run: pip3 install meson ninja
+      
+      - name: Prepare compiler cache
+        id: prep-ccache
+        shell: bash
+        run: |
+          mkdir -p "${CCACHE_DIR}"
+          echo "::set-output name=dir::$CCACHE_DIR"
+          echo "::set-output name=today::$(date -I)"
+          
+      - name: Load Cache
+        id: windows-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.prep-ccache.outputs.dir }}
+          key: ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+          restore-keys: |
+            ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+            ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}
+            ${{github.job}}-${{env.BASE_BRANCH}}
+        continue-on-error: true
+      
+      - name: Setup Meson
+        run: meson setup builddir #-Ddefault_library=static
+      
+      - name: Compilation
+        run: |
+          cd builddir
+          meson compile --verbose
+      
+      # DLL's don't get copied and cause a test fail. Meson Bug?
+      - name: Run Tests
+        run: meson test -C builddir -v
+        continue-on-error: true
+  
+  msvc-debug:
+    name: MSVC (Debug)
+    runs-on: windows-latest
+
+    steps:
+    - name: Fetch Sources
+      uses: actions/checkout@v2
+    
+    - name: Prepare compiler cache
+      id: prep-ccache
+      shell: bash
+      run: |
+        mkdir -p "${CCACHE_DIR}"
+        echo "::set-output name=dir::$CCACHE_DIR"
+        echo "::set-output name=today::$(date -I)"
+        
+    - name: Load Cache
+      id: windows-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.prep-ccache.outputs.dir }}
+        key: ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+        restore-keys: |
+          ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+          ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}
+          ${{github.job}}-${{env.BASE_BRANCH}}
+      continue-on-error: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Python Dependencies
+      run: pip install meson ninja
+
+    - name: Prepare MSVC
+      uses: bus1/cabuild/action/msdevshell@v1
+      with:
+        architecture: x64
+    # We need to use static linking, because Mesons setup for MSVC is broken and links against .lib files even though it generated .dlls
+    - name: Prepare Build
+      run: meson setup build -Ddefault_library=static
+    - name: Run Build
+      run: cd build && meson compile -v
+    - name: Run Test Suite
+      run: cd build && meson test -v

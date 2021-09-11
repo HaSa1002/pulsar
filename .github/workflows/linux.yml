@@ -1,0 +1,78 @@
+name: Linux Builds
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+env:
+  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+  BASE_BRANCH: main
+
+jobs:
+  # This workflow contains a single job called "build"
+  ninja-debug:
+    name: Ninja (Debug)
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      
+      #- name: Install Ninja
+      #  id: ninja
+      #  uses: turtlesec-no/get-ninja@main
+
+      - name: Setup Meson and Ninja
+        run: pip3 install meson ninja
+      
+      - name: Prepare compiler cache
+        id: prep-ccache
+        shell: bash
+        run: |
+          mkdir -p "${CCACHE_DIR}"
+          echo "::set-output name=dir::$CCACHE_DIR"
+          echo "::set-output name=today::$(date -I)"
+         
+      - name: Load Cache
+        id: linux-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.prep-ccache.outputs.dir }}
+          key: ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+          restore-keys: |
+            ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}-${{github.sha}}
+            ${{github.job}}-${{env.BASE_BRANCH}}-${{github.ref}}
+            ${{github.job}}-${{env.BASE_BRANCH}}
+        continue-on-error: true
+      
+      - name: Setup Meson
+        run: |
+          meson setup builddir
+      
+      - name: Compilation
+        run: |
+          cd builddir
+          meson compile --verbose
+      
+      - name: Run Tests
+        run: |
+          cd builddir
+          meson test --verbose
+      
+      - name: Print test output
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          cat builddir/meson-logs/testlog.txt
+          
