@@ -1,3 +1,3 @@
-library('doctest', 'doctest.h')
+#LIB_TEST = library('doctest', 'doctest.h')
 
 INC_TEST = include_directories('.')
