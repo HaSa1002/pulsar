@@ -36,6 +36,9 @@ jobs:
       - name: Setup Meson and Ninja
         run: pip3 install meson ninja
       
+      - name: Install dependencies
+        run: brew install $(< misc/brew/dependencies)
+      
       - name: Prepare compiler cache
         id: prep-ccache
         shell: bash
