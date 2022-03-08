@@ -39,3 +39,6 @@ subdir('services')
 
 # Main may be removed in the future as we are going to have many apps
 subdir('main')
+
+# Build our apps
+subdir('apps')
