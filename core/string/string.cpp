@@ -24,7 +24,7 @@ String::String(const std::string& str) noexcept {
 	data = str;
 }
 
-const char* String::get_data() {
+const char* String::get_data() const {
 	return data.data();
 }
 
