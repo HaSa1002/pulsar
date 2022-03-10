@@ -39,7 +39,7 @@ namespace pulsar {
 		}
 
 		void emit(Args&&... args) {
-			for (auto listener : callbacks) {
+			for (const auto& listener : callbacks) {
 				ERR_CONTINUE_MSG(!listener.second, "Empty listener was tried to be emitted!");
 				listener.second(args...);
 			}
