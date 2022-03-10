@@ -1,8 +1,11 @@
 INPUT_SOURCES = files([
 	'input.cpp'
 ])
-INC_INPUT = include_directories('.')
+input_inc = include_directories('.')
 
-input = library('input', INPUT_SOURCES, include_directories: INCDIRS, cpp_args: [EXTRA_CPP_ARGS, '-DDOCTEST_CONFIG_DISABLE'], install: true, dependencies: [sdl2, core])
-DEPENDENCIES += input
-test('input_test', executable('input', 'input_test.cpp', link_with: [input], include_directories: INCDIRS, cpp_args: EXTRA_CPP_ARGS, dependencies: [sdl2, core]))
+inputlib = library('input', INPUT_SOURCES, include_directories: DOCTEST_INC, cpp_args: [EXTRA_CPP_ARGS, '-DDOCTEST_CONFIG_DISABLE'], install: true, dependencies: [sdl2, core])
+input = declare_dependency(include_directories: input_inc, dependencies: [sdl2, core], link_with: inputlib)
+
+ALL_DEPENDENCIES += input
+
+#test('input_test', executable('input_test', 'input_test.cpp', include_directories: DOCTEST_INC, cpp_args: EXTRA_CPP_ARGS, dependencies: [input]))
