@@ -7,4 +7,4 @@ ntklib = library('ntk', NTK_SOURCES, include_directories: DOCTEST_INC, cpp_args:
 ntk = declare_dependency(include_directories: ntk_inc, link_with: ntklib, dependencies: core)
 
 ALL_DEPENDENCIES += ntk
-#test('ntk_test', executable('ntk_test', 'ntk_test.cpp', include_directories: DOCTEST_INC, cpp_args: EXTRA_CPP_ARGS, dependencies: core))
+test('ntk_test', executable('ntk_test', 'ntk_test.cpp', cpp_args: EXTRA_CPP_ARGS, dependencies: ntk))

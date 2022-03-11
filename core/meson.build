@@ -6,8 +6,8 @@ subdir('math')
 subdir('string')
 subdir('error')
 
-corelib = library('core', CORE_SOURCES, include_directories: DOCTEST_INC, cpp_args: [EXTRA_CPP_ARGS, '-DDOCTEST_CONFIG_DISABLE'], link_with: [], install: true)
+corelib = library('core', CORE_SOURCES, include_directories: DOCTEST_INC, cpp_args: [EXTRA_CPP_ARGS, '-DDOCTEST_CONFIG_DISABLE'], install: true)
 core = declare_dependency(include_directories: [core_includes, DOCTEST_INC], link_with: corelib)
 
 ALL_DEPENDENCIES += core
-#test('core_test', executable('core_test', 'core_test.cpp', include_directories: [DOCTEST_INC], cpp_args: EXTRA_CPP_ARGS, dependencies: core))
+test('core_test', executable('core_test', 'core_test.cpp', cpp_args: EXTRA_CPP_ARGS, dependencies: core))

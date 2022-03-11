@@ -8,4 +8,4 @@ input = declare_dependency(include_directories: input_inc, dependencies: [sdl2, 
 
 ALL_DEPENDENCIES += input
 
-#test('input_test', executable('input_test', 'input_test.cpp', include_directories: DOCTEST_INC, cpp_args: EXTRA_CPP_ARGS, dependencies: [input]))
+test('input_test', executable('input_test', 'input_test.cpp', cpp_args: EXTRA_CPP_ARGS, dependencies: input))
