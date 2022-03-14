@@ -26,6 +26,9 @@ public:
 public:
 	ToolWindowSDL(const String& title, int width, int height);
 	~ToolWindowSDL();
+	static String getDefaultVertexShader();
+	static String getDefaultFragmentShader();
+	bool compileShader(const String& source, unsigned int* shader, unsigned int type);
 
 	void run();
 
@@ -36,6 +39,9 @@ private:
 	bool running = true;
 	int width = 0;
 	int height = 0;
+	unsigned int vbo;
+	unsigned int vao;
+	unsigned int shaderProgram;
 
 private:
 	void initialise(const String &title);
