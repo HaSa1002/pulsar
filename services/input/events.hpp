@@ -1,8 +1,9 @@
 #pragma once
 
+#include "core/reference.hpp"
 #include "key_list.hpp"
 
-struct InputEvent {
+struct InputEvent : public RefCounted {
 	enum Type {
 		None,
 		Key,

@@ -42,10 +42,20 @@ bool InputProviderSDL::canConsumeEvent(SDL_Event& sdlEvent) {
 }
 
 void InputProviderSDL::consumeEvent(SDL_Event& sdlEvent) {
+	Ref<InputEvent> event = nullptr;
 	switch (sdlEvent.type) {
 		case SDL_KEYDOWN:
-		case SDL_KEYUP:
+		case SDL_KEYUP: {
+			SDL_KeyboardEvent& sdlKey = sdlEvent.key;
+			Ref<InputEventKey> keyEvent{};
+			keyEvent->keycode = static_cast<Keycode::Keycode>(sdlKey.keysym.sym);
+			keyEvent->scancode = static_cast<Scancode::Scancode>(sdlKey.keysym.scancode);
+			keyEvent->modifier = static_cast<Keymod::Keymod>(sdlKey.keysym.mod);
+			keyEvent->pressed = sdlEvent.type == SDL_KEYDOWN;
+			keyEvent->repeated = sdlKey.repeat != 0;
+			event = keyEvent;
 			break;
+		}
 		case SDL_CONTROLLERAXISMOTION:
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP:
@@ -59,6 +69,7 @@ void InputProviderSDL::consumeEvent(SDL_Event& sdlEvent) {
 		case SDL_MOUSEBUTTONUP:
 		case SDL_MOUSEWHEEL:
 		default:
+			SDL_assert(false);
 			break;
 	}
 }
