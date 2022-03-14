@@ -2,6 +2,19 @@
 
 // The codes are copied from SDL. Stripped of their prefix and put into a namespace to prevent pollution
 
+#ifdef DELETE
+//#error "Someone is polluting the global namespace!";
+#undef DELETE
+#endif
+
+#ifdef CLEAR
+#undef CLEAR
+#endif
+
+#ifdef OUT
+#undef OUT
+#endif
+
 namespace Scancode {
 	enum Scancode {
 		UNKNOWN = 0,
