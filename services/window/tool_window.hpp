@@ -3,6 +3,8 @@
 
 #include <SDL_video.h>
 #include <SDL_events.h>
+#include <SDL_render.h>
+#include <SDL_opengl.h>
 #include "core/string/string.hpp"
 
 #include "services/input/input.hpp"
@@ -30,10 +32,15 @@ public:
 private:
 	InputProviderSDL input_provider;
 	SDL_Window* window;
+	SDL_GLContext glContext;
 	bool running = true;
+	int width = 0;
+	int height = 0;
 
 private:
-	void initialise(const String &title, int width, int height);
+	void initialise(const String &title);
 	void pollEvents();
+	void update();
+	void render();
 	void parseWindowEvent(const SDL_WindowEvent& event);
 };
