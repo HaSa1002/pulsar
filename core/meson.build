@@ -1,5 +1,8 @@
 CORE_DEPS = []
-CORE_SOURCES = []
+CORE_SOURCES = [
+    'object.cpp',
+    'reference.cpp',
+]
 core_includes = include_directories('.')
 
 subdir('math')
@@ -10,4 +13,7 @@ corelib = library('core', CORE_SOURCES, include_directories: DOCTEST_INC, cpp_ar
 core = declare_dependency(include_directories: [core_includes, DOCTEST_INC], link_with: corelib)
 
 ALL_DEPENDENCIES += core
-test('core_test', executable('core_test', 'core_test.cpp', cpp_args: EXTRA_CPP_ARGS, dependencies: core))
+
+core_test_sources = CORE_SOURCES
+core_test_sources += 'core_test.cpp'
+test('core_test', executable('core_test', core_test_sources, cpp_args: EXTRA_CPP_ARGS, include_directories: [DOCTEST_INC]))
