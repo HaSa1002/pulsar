@@ -24,7 +24,8 @@ Use the package manager of your distro. Use the distro-specific one liners below
 We maintain a list of the package names in `misc/<package manager>/dependencies`
 
 1. [SDL (Simple Direct Media Layer)](https://www.libsdl.org/)
-2. more *will* follow :)
+2. OpenGL >= 3.3
+3. more *will* follow :)
 
 ### Windows
 

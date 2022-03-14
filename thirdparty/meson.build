@@ -1,1 +1,2 @@
 subdir('doctest')
+subdir('glad')
