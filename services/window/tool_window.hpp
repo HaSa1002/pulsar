@@ -47,7 +47,7 @@ private:
 private:
 	void initialise(const String &title);
 	void pollEvents();
-	void update();
-	void render();
+	void update(float delta);
+	void render(float delta, float elapsedTime);
 	void parseWindowEvent(const SDL_WindowEvent& event);
 };

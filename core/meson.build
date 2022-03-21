@@ -8,6 +8,7 @@ core_includes = include_directories('.')
 subdir('math')
 subdir('string')
 subdir('error')
+subdir('time')
 
 corelib = library('core', CORE_SOURCES, include_directories: DOCTEST_INC, cpp_args: [EXTRA_CPP_ARGS, '-DDOCTEST_CONFIG_DISABLE'], install: true)
 core = declare_dependency(include_directories: [core_includes, DOCTEST_INC], link_with: corelib)

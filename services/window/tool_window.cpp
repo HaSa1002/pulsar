@@ -1,8 +1,13 @@
 
 #include <glad/glad.h>
 #include "tool_window.hpp"
+
+#include "core/time/stopwatch.hpp"
+
 #include <SDL.h>
 #include <SDL_events.h>
+
+
 
 ToolWindowSDL::ToolWindowSDL(const String &title, int width, int height) :width{width}, height{height} {
 	input_provider.registerInputFilter(&input);
@@ -100,10 +105,13 @@ void ToolWindowSDL::initialise(const String &title) {
 }
 
 void ToolWindowSDL::run() {
+	Ref<Stopwatch> deltaClock{new Stopwatch};
+	Ref<Stopwatch> clock{new Stopwatch};
 	while (running) {
 		pollEvents();
-		update();
-		render();
+		float delta = deltaClock->restart();
+		update(delta);
+		render(delta, clock->getElapsedTime());
 	}
 }
 
@@ -148,12 +156,12 @@ void ToolWindowSDL::parseWindowEvent(const SDL_WindowEvent& event) {
 }
 
 /// Notify something
-void ToolWindowSDL::update() {
+void ToolWindowSDL::update(float delta) {
 
 }
 
 /// Render screen
-void ToolWindowSDL::render() {
+void ToolWindowSDL::render(float delta, float elapsedTime) {
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	// Render frame
@@ -194,7 +202,9 @@ String ToolWindowSDL::getDefaultFragmentShader() {
 	return String(R"(#version 330 core
 out vec4 FragColor;
 
+uniform vec4 ourColor;
+
 void main() {
-	FragColor = vec4(1.0, 0.5, 0.2, 1.0);
+	FragColor = ourColor;
 })");
 }

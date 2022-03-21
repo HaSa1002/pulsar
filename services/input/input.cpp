@@ -47,7 +47,7 @@ void InputProviderSDL::consumeEvent(SDL_Event& sdlEvent) {
 		case SDL_KEYDOWN:
 		case SDL_KEYUP: {
 			SDL_KeyboardEvent& sdlKey = sdlEvent.key;
-			Ref<InputEventKey> keyEvent{};
+			Ref<InputEventKey> keyEvent{new InputEventKey};
 			keyEvent->keycode = static_cast<Keycode::Keycode>(sdlKey.keysym.sym);
 			keyEvent->scancode = static_cast<Scancode::Scancode>(sdlKey.keysym.scancode);
 			keyEvent->modifier = static_cast<Keymod::Keymod>(sdlKey.keysym.mod);
