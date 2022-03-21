@@ -6,7 +6,11 @@ window_inc = include_directories('.')
 window_dependencies = [input, gl, glad]
 
 if host_machine.system() == 'linux'
-	window_dependencies += dl
+	if meson.version().version_compare('>=0.62.0')
+		window_dependencies += dl
+	else
+		EXTRA_CPP_ARGS += '-ldl'
+	endif
 endif
 
 windowlib = library('window', window_sources, include_directories: DOCTEST_INC, cpp_args: [EXTRA_CPP_ARGS, '-DDOCTEST_CONFIG_DISABLE'], install: true, dependencies: window_dependencies) # or sdl2, core, input
