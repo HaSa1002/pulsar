@@ -28,7 +28,7 @@ public:
 	~ToolWindowSDL();
 	static String getDefaultVertexShader();
 	static String getDefaultFragmentShader();
-	bool compileShader(const String& source, unsigned int* shader, unsigned int type);
+	static bool compileShader(const String& source, unsigned int* shader, unsigned int type);
 
 	void run();
 

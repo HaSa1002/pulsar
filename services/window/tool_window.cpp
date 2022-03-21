@@ -7,6 +7,8 @@
 #include <SDL.h>
 #include <SDL_events.h>
 
+#include <cmath>
+
 
 
 ToolWindowSDL::ToolWindowSDL(const String &title, int width, int height) :width{width}, height{height} {
@@ -78,14 +80,13 @@ void ToolWindowSDL::initialise(const String &title) {
 
 	// 5. Buffer setups
 	float vertices[] = {
-			0.5f,  0.5f, 0.0f,  // top right
-			0.5f, -0.5f, 0.0f,  // bottom right
-			-0.5f, -0.5f, 0.0f,  // bottom left
-			-0.5f,  0.5f, 0.0f   // top left
+			// positions         				// colors
+			0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	// bottom right
+			-0.5f,	-0.5f,	0.0f, 	0.0f,	1.0f,	0.0f,	// bottom left
+			0.0f,  0.5f,	0.0f,	0.0f,	0.0f,	1.0f	// top
 	};
 	unsigned int indices[] = {
-			0, 1, 3,   // first triangle
-			1, 2, 3    // second triangle
+			0, 1, 2,   // first triangle
 	};
 
 	glGenVertexArrays(1, &vao);
@@ -100,8 +101,10 @@ void ToolWindowSDL::initialise(const String &title) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
 void ToolWindowSDL::run() {
@@ -165,7 +168,12 @@ void ToolWindowSDL::render(float delta, float elapsedTime) {
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	// Render frame
+
 	glUseProgram(shaderProgram);
+	//float green = sin(elapsedTime) / 2.0f + 0.5f;
+	//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+	//glUniform4f(vertexColorLocation, 0.0f, green, 0.0f, 1.0f);
+
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
@@ -190,21 +198,25 @@ bool ToolWindowSDL::compileShader(const String& source, unsigned int* shader, un
 }
 
 String ToolWindowSDL::getDefaultVertexShader() {
-	return String(R"(#version 330 core
+	return {R"(#version 330 core
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aColor;
+
+out vec3 ourColor;
 
 void main() {
 	gl_Position = vec4(aPos, 1.0);
-})");
+	ourColor = aColor;
+})"};
 }
 
 String ToolWindowSDL::getDefaultFragmentShader() {
-	return String(R"(#version 330 core
+	return {R"(#version 330 core
 out vec4 FragColor;
 
-uniform vec4 ourColor;
+in vec3 ourColor;
 
 void main() {
-	FragColor = ourColor;
-})");
+	FragColor = vec4(ourColor, 1.0);
+})"};
 }
