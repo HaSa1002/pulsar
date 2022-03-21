@@ -11,6 +11,7 @@ ToolWindowSDL::ToolWindowSDL(const String &title, int width, int height) :width{
 
 // TODO: split window init and render init
 void ToolWindowSDL::initialise(const String &title) {
+	// 1. SDL
 	SDL_SetMainReady();
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		std::cerr << "Failed to initialise SDL\n";
@@ -22,6 +23,7 @@ void ToolWindowSDL::initialise(const String &title) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
+	// 2. Window
 	window = SDL_CreateWindow(title.get_data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 										  width, height,
 										  SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
@@ -30,6 +32,7 @@ void ToolWindowSDL::initialise(const String &title) {
 		std::cerr << "Failed to create window\n";
 		return;
 	}
+	// 3. OpenGL
 	glContext = SDL_GL_CreateContext(window);
 	if (glContext == nullptr) {
 		std::cerr << "Failed to create OpenGL Context!\n";
@@ -47,18 +50,7 @@ void ToolWindowSDL::initialise(const String &title) {
 	}
 	glViewport(0,0, width, height);
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	float vertices[] = {
-			-0.5f, -0.5f, 0.0f,
-			0.5f, -0.5f, 0.0f,
-			0.0f,  0.5f, 0.0f
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+	// 4. Shaders
 	unsigned int vertexShader;
 	unsigned int fragmentShader;
 	compileShader(getDefaultVertexShader(), &vertexShader, GL_VERTEX_SHADER);
@@ -78,6 +70,30 @@ void ToolWindowSDL::initialise(const String &title) {
 	}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	// 5. Buffer setups
+	float vertices[] = {
+			0.5f,  0.5f, 0.0f,  // top right
+			0.5f, -0.5f, 0.0f,  // bottom right
+			-0.5f, -0.5f, 0.0f,  // bottom left
+			-0.5f,  0.5f, 0.0f   // top left
+	};
+	unsigned int indices[] = {
+			0, 1, 3,   // first triangle
+			1, 2, 3    // second triangle
+	};
+
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &ebo);
+
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -143,7 +159,7 @@ void ToolWindowSDL::render() {
 	// Render frame
 	glUseProgram(shaderProgram);
 	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 	// Swap buffer
 	SDL_GL_SwapWindow(window);

@@ -41,6 +41,7 @@ private:
 	int height = 0;
 	unsigned int vbo;
 	unsigned int vao;
+	unsigned int ebo;
 	unsigned int shaderProgram;
 
 private:
