@@ -58,25 +58,8 @@ void ToolWindowSDL::initialise(const String &title) {
 	glViewport(0,0, width, height);
 
 	// 4. Shaders
-	unsigned int vertexShader;
-	unsigned int fragmentShader;
-	compileShader(getDefaultVertexShader(), &vertexShader, GL_VERTEX_SHADER);
-	compileShader(getDefaultFragmentShader(), &fragmentShader, GL_FRAGMENT_SHADER);
-
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	int success = 0;
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		char message[512];
-		glGetProgramInfoLog(shaderProgram, 512, nullptr, message);
-		std::cout << "Failed to link shader program: " << message << "\n";
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	mainShader->compile(getDefaultVertexShader(), getDefaultFragmentShader());
+	ERR_FAIL_COND(!mainShader->isWorking());
 
 	// 5. Buffer setups
 	float vertices[] = {
@@ -169,7 +152,7 @@ void ToolWindowSDL::render(float delta, float elapsedTime) {
 	glClear(GL_COLOR_BUFFER_BIT);
 	// Render frame
 
-	glUseProgram(shaderProgram);
+	mainShader->use();
 	//float green = sin(elapsedTime) / 2.0f + 0.5f;
 	//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 	//glUniform4f(vertexColorLocation, 0.0f, green, 0.0f, 1.0f);

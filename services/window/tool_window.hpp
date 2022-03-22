@@ -8,6 +8,7 @@
 #include "core/string/string.hpp"
 
 #include "services/input/input.hpp"
+#include "services/rendering/shader.hpp"
 
 /// Tool windows take care of event handling and the main loop.
 /// They are thought as application bootstrapper.
@@ -42,7 +43,7 @@ private:
 	unsigned int vbo;
 	unsigned int vao;
 	unsigned int ebo;
-	unsigned int shaderProgram;
+	Ref<Shader> mainShader = Ref<Shader>(new Shader);
 
 private:
 	void initialise(const String &title);

@@ -11,5 +11,6 @@ if host_machine.system() == 'linux'
 	endif
 endif
 
+subdir('rendering')
 subdir('input')
 subdir('window')

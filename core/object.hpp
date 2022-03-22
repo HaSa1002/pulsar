@@ -1,11 +1,10 @@
 #pragma once
 
-#include <string/string.hpp>
+#include "core/string/string.hpp"
 
 /// pulsar base class.
 /// take a look at Godots object
 class Object {
-
 public:
 	template<class T>
 	static T* castTo(Object* p_object) {
