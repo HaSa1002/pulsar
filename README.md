@@ -33,19 +33,18 @@ We maintain a list of the package names in `misc/<package manager>/dependencies`
 
 Scoop libraries can be found in `misc\scoop\dependencies`. However, just copy one of the two one liners below to get easily started.
 
-The installation script of SDL is not working properly.
-Use the version in `misc\scoop\` instead
+However, we need to use [vcpkg](https://vcpkg.io) as well, since scoop is designed for applications and doesn't include that many libraries.
 
 With build tools:
 
 ```commandline
-@("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
+@("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}; Get-Content misc/vcpkg/dependencies | ForEach-Object {vcpkg install $_}
 ```
 
 Without build tools:
 
 ```commandline
-Get-Content misc/scoop/dependencies | ForEach-Object {scoop install $_} 
+Get-Content misc/scoop/dependencies | ForEach-Object {scoop install $_}; Get-Content misc/vcpkg/dependencies | ForEach-Object {vcpkg install $_}
 ```
 
 ### Debian (apt)
