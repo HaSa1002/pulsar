@@ -53,7 +53,7 @@ jobs:
         shell: pwsh
         run: |
           if (Test-Path "$Env:USERPROFILE\scoop\pkg_config") {$Env:PKG_CONFIG_PATH=Get-Content "$Env:USERPROFILE\scoop\pkg_config"}
-          @("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}; Get-Content misc/vcpkg/dependencies | ForEach-Object {vcpkg install $_}
+          @("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
           $pkg_config_path = $Env:PKG_CONFIG_PATH
           $pkg_config_path += ";C:\vcpkg\installed\x86-windows\lib\pkgconfig"
           echo "PKG_CONFIG_PATH=$pkg_config_path" >> $Env:GITHUB_ENV
@@ -136,9 +136,8 @@ jobs:
         shell: pwsh
         run: |
           if (Test-Path "$Env:USERPROFILE\scoop\pkg_config") {$Env:PKG_CONFIG_PATH=Get-Content "$Env:USERPROFILE\scoop\pkg_config"}
-          @("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}; Get-Content misc/vcpkg/dependencies | ForEach-Object {vcpkg install $_}
+          @("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
           $pkg_config_path = $Env:PKG_CONFIG_PATH
-          $pkg_config_path += ";C:\vcpkg\installed\x86-windows\lib\pkgconfig"
           echo "PKG_CONFIG_PATH=$pkg_config_path" >> $Env:GITHUB_ENV
           echo $Env:PKG_CONFIG_PATH >> "$Env:USERPROFILE\scoop\pkg_config"
           echo $pkg_config_path

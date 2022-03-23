@@ -25,7 +25,8 @@ We maintain a list of the package names in `misc/<package manager>/dependencies`
 
 1. [SDL (Simple Direct Media Layer)](https://www.libsdl.org/)
 2. OpenGL >= 3.3
-3. more *will* follow :)
+3. [zlib](https://zlib.net/)
+4. [libpng](http://www.libpng.org)
 
 ### Windows
 
@@ -33,18 +34,18 @@ We maintain a list of the package names in `misc/<package manager>/dependencies`
 
 Scoop libraries can be found in `misc\scoop\dependencies`. However, just copy one of the two one liners below to get easily started.
 
-However, we need to use [vcpkg](https://vcpkg.io) as well, since scoop is designed for applications and doesn't include that many libraries.
+Since not all requirements are satisfiable by scoop, we also take advantage of meson wraps. These can be found in the `subprojects` folder and are automatically installed if meson cannot find them.
 
 With build tools:
 
 ```commandline
-@("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}; Get-Content misc/vcpkg/dependencies | ForEach-Object {vcpkg install $_}
+@("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
 ```
 
 Without build tools:
 
 ```commandline
-Get-Content misc/scoop/dependencies | ForEach-Object {scoop install $_}; Get-Content misc/vcpkg/dependencies | ForEach-Object {vcpkg install $_}
+Get-Content misc/scoop/dependencies | ForEach-Object {scoop install $_}
 ```
 
 ### Debian (apt)

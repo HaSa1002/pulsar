@@ -1,3 +1,6 @@
 .vscode/*
 .idea
 bin
+
+subprojects/*
+!subprojects/*.wrap

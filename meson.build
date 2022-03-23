@@ -4,7 +4,7 @@ project(
 	version: '0.1',
 	license: 'MIT',
 	default_options: [
-	'c_std=11',
+	'c_std=c11',
 	'cpp_std=c++17'
 	]
 )
