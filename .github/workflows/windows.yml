@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - main
-    - add-vision
   pull_request:
     branches:
     - main
@@ -84,10 +83,20 @@ jobs:
       - name: Setup Meson
         run: meson setup builddir
       
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat builddir/meson-logs/meson-log.txt
+      
       - name: Compilation
         run: |
           cd builddir
           meson compile --verbose
+      
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat builddir/meson-logs/meson-log.txt
       
       # DLL's don't get copied and cause a test fail. Meson Bug?
       - name: Run Tests
@@ -171,9 +180,19 @@ jobs:
       # We need to use static linking, because Mesons setup for MSVC is broken and links against .lib files even though it generated .dlls
       - name: Prepare Build
         run: meson setup build -Ddefault_library=static
+      
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat build/meson-logs/meson-log.txt
 
       - name: Run Build
         run: cd build && meson compile -v
+      
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat build/meson-logs/meson-log.txt
 
       - name: Run Test Suite
         run: cd build && meson test -v
