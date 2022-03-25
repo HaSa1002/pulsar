@@ -1,9 +1,10 @@
 rendering_sources = files([
-    'shader.cpp'
+    'shader.cpp',
+    'image.cpp'
 ])
 
 rendering_inc = include_directories('.')
-rendering_dependencies = [gl, glad, core]
+rendering_dependencies = [gl, glad, core, dependency('libpng'), dependency('libjpeg')]
 
 if host_machine.system() == 'linux'
 	if meson.version().version_compare('>=0.62.0')
