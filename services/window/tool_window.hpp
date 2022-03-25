@@ -43,6 +43,8 @@ private:
 	unsigned int vbo;
 	unsigned int vao;
 	unsigned int ebo;
+	unsigned int wooden_crate;
+	unsigned int smiley;
 	Ref<Shader> mainShader = Ref<Shader>(new Shader);
 
 private:

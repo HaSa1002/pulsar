@@ -2,12 +2,14 @@
 #include <glad/glad.h>
 #include "tool_window.hpp"
 
+#include "services/rendering/image.hpp"
+
 #include "core/time/stopwatch.hpp"
 
 #include <SDL.h>
 #include <SDL_events.h>
 
-#include <cmath>
+#include <fstream>
 
 
 
@@ -63,13 +65,15 @@ void ToolWindowSDL::initialise(const String &title) {
 
 	// 5. Buffer setups
 	float vertices[] = {
-			// positions         				// colors
-			0.5f,	-0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	// bottom right
-			-0.5f,	-0.5f,	0.0f, 	0.0f,	1.0f,	0.0f,	// bottom left
-			0.0f,  0.5f,	0.0f,	0.0f,	0.0f,	1.0f	// top
+			// positions          // colors           // texture coords
+			0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+			0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+			-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+			-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left
 	};
 	unsigned int indices[] = {
-			0, 1, 2,   // first triangle
+			0, 1, 3, // first triangle
+			1, 2, 3  // second triangle
 	};
 
 	glGenVertexArrays(1, &vao);
@@ -84,10 +88,48 @@ void ToolWindowSDL::initialise(const String &title) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	std::ifstream img_file{"img/wooden_crate.jpg", std::ios::binary | std::ios::in};
+	ERR_FAIL_COND_MSG(!img_file.is_open(), "Failed to load image!");
+
+	Image img;
+	int code = img.loadJpegFromStream(img_file);
+	ERR_FAIL_COND_MSG(code != 0, "Failed to load JPEG file!");
+	glGenTextures(1, &wooden_crate);
+	glBindTexture(GL_TEXTURE_2D, wooden_crate);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, (img.getChannels() == 3 ? GL_RGB : GL_RGBA),
+				 img.getWidth(), img.getHeight(), 0,
+				 (img.getChannels() == 3 ? GL_RGB : GL_RGBA), GL_UNSIGNED_BYTE,
+				 img.getData());
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	std::ifstream face_file{"img/awesomeface.png", std::ios::binary | std::ios::in};
+	ERR_FAIL_COND_MSG(!face_file.is_open(), "Failed to load image!");
+
+	Image face;
+	code = img.loadPngFromStream(face_file);
+	ERR_FAIL_COND_MSG(code != 0, "Failed to load JPEG file!");
+	glGenTextures(1, &smiley);
+	glBindTexture(GL_TEXTURE_2D, smiley);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, (img.getChannels() == 3 ? GL_RGB : GL_RGBA),
+				 img.getWidth(), img.getHeight(), 0,
+				 (img.getChannels() == 3 ? GL_RGB : GL_RGBA), GL_UNSIGNED_BYTE,
+				 img.getData());
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void ToolWindowSDL::run() {
@@ -153,10 +195,16 @@ void ToolWindowSDL::render(float delta, float elapsedTime) {
 	// Render frame
 
 	mainShader->use();
+	mainShader->set("texture1", (int)0);
+	mainShader->set("texture2", (int)1);
 	//float green = sin(elapsedTime) / 2.0f + 0.5f;
 	//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 	//glUniform4f(vertexColorLocation, 0.0f, green, 0.0f, 1.0f);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, wooden_crate);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, smiley);
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
@@ -164,32 +212,19 @@ void ToolWindowSDL::render(float delta, float elapsedTime) {
 	SDL_GL_SwapWindow(window);
 }
 
-bool ToolWindowSDL::compileShader(const String& source, unsigned int* shader, unsigned int type) {
-	*shader = glCreateShader(type);
-	const char* src = source.get_data();
-	glShaderSource(*shader, 1, &src, nullptr);
-	glCompileShader(*shader);
-	int success;
-	glGetShaderiv(*shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		char message[512];
-		glGetShaderInfoLog(*shader, 512, nullptr, message);
-		std::cout << "Failed to compile shader (" << success << "): " << message << "\n";
-		return false;
-	}
-	return true;
-}
-
 String ToolWindowSDL::getDefaultVertexShader() {
 	return {R"(#version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
+layout (location = 2) in vec2 aTexCoord;
 
 out vec3 ourColor;
+out vec2 TexCoord;
 
 void main() {
 	gl_Position = vec4(aPos, 1.0);
 	ourColor = aColor;
+	TexCoord = aTexCoord;
 })"};
 }
 
@@ -198,8 +233,12 @@ String ToolWindowSDL::getDefaultFragmentShader() {
 out vec4 FragColor;
 
 in vec3 ourColor;
+in vec2 TexCoord;
+
+uniform sampler2D texture1;
+uniform sampler2D texture2;
 
 void main() {
-	FragColor = vec4(ourColor, 1.0);
+	FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);
 })"};
 }
