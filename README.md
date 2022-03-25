@@ -24,7 +24,9 @@ Use the package manager of your distro. Use the distro-specific one liners below
 We maintain a list of the package names in `misc/<package manager>/dependencies`
 
 1. [SDL (Simple Direct Media Layer)](https://www.libsdl.org/)
-2. more *will* follow :)
+2. OpenGL >= 3.3
+3. [zlib](https://zlib.net/)
+4. [libpng](http://www.libpng.org)
 
 ### Windows
 
@@ -32,8 +34,7 @@ We maintain a list of the package names in `misc/<package manager>/dependencies`
 
 Scoop libraries can be found in `misc\scoop\dependencies`. However, just copy one of the two one liners below to get easily started.
 
-The installation script of SDL is not working properly.
-Use the version in `misc\scoop\` instead
+Since not all requirements are satisfiable by scoop, we also take advantage of meson wraps. These can be found in the `subprojects` folder and are automatically installed if meson cannot find them.
 
 With build tools:
 
@@ -44,7 +45,7 @@ With build tools:
 Without build tools:
 
 ```commandline
-Get-Content misc/scoop/dependencies | ForEach-Object {scoop install $_} 
+Get-Content misc/scoop/dependencies | ForEach-Object {scoop install $_}
 ```
 
 ### Debian (apt)

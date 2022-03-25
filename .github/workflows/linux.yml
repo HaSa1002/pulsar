@@ -37,7 +37,9 @@ jobs:
         run: pip3 install meson ninja
 
       - name: Install dependencies
-        run: xargs -a misc/apt/dependencies sudo apt install -y
+        run: |
+          sudo apt update
+          xargs -a misc/apt/dependencies sudo apt install -y
       
       - name: Prepare compiler cache
         id: prep-ccache

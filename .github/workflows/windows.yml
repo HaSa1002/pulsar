@@ -43,18 +43,22 @@ jobs:
         shell: pwsh
         run: |
           Set-ExecutionPolicy RemoteSigned -scope CurrentUser
-          iwr -useb get.scoop.sh | iex
+          iwr -useb get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
           scoop bucket add extras
           echo "$Env:USERPROFILE\scoop\shims" >> $Env:GITHUB_PATH
 
       # If this is ever breaks (it will because we save the environment variable in the cache in a file), use forced installs instead.
-      - name: Install dependencies (using scoop)
+      - name: Install dependencies
         shell: pwsh
         run: |
           if (Test-Path "$Env:USERPROFILE\scoop\pkg_config") {$Env:PKG_CONFIG_PATH=Get-Content "$Env:USERPROFILE\scoop\pkg_config"}
-          @('meson', 'ninja', 'pkg-config') + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
-          echo "PKG_CONFIG_PATH=$Env:PKG_CONFIG_PATH" >> $Env:GITHUB_ENV
+          @("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
+          $pkg_config_path = $Env:PKG_CONFIG_PATH
+          $pkg_config_path += ";C:\vcpkg\installed\x86-windows\lib\pkgconfig"
+          echo "PKG_CONFIG_PATH=$pkg_config_path" >> $Env:GITHUB_ENV
           echo $Env:PKG_CONFIG_PATH >> "$Env:USERPROFILE\scoop\pkg_config"
+          echo $pkg_config_path
 
       - name: Prepare compiler cache
         id: prep-ccache
@@ -79,10 +83,20 @@ jobs:
       - name: Setup Meson
         run: meson setup builddir
       
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat builddir/meson-logs/meson-log.txt
+      
       - name: Compilation
         run: |
           cd builddir
           meson compile --verbose
+      
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat builddir/meson-logs/meson-log.txt
       
       # DLL's don't get copied and cause a test fail. Meson Bug?
       - name: Run Tests
@@ -122,18 +136,21 @@ jobs:
         shell: pwsh
         run: |
           Set-ExecutionPolicy RemoteSigned -scope CurrentUser
-          iwr -useb get.scoop.sh | iex
+          iwr -useb get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
           scoop bucket add extras
           echo "$Env:USERPROFILE\scoop\shims" >> $Env:GITHUB_PATH
 
       # If this is ever breaks (it will because we save the environment variable in the cache in a file), use forced installs instead.
-      - name: Install dependencies (using scoop)
+      - name: Install dependencies
         shell: pwsh
         run: |
           if (Test-Path "$Env:USERPROFILE\scoop\pkg_config") {$Env:PKG_CONFIG_PATH=Get-Content "$Env:USERPROFILE\scoop\pkg_config"}
-          @('meson', 'ninja', 'pkg-config') + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
-          echo "PKG_CONFIG_PATH=$Env:PKG_CONFIG_PATH" >> $Env:GITHUB_ENV
+          @("meson", "ninja", "pkg-config") + (Get-Content misc/scoop/dependencies) | ForEach-Object {scoop install $_}
+          $pkg_config_path = $Env:PKG_CONFIG_PATH
+          echo "PKG_CONFIG_PATH=$pkg_config_path" >> $Env:GITHUB_ENV
           echo $Env:PKG_CONFIG_PATH >> "$Env:USERPROFILE\scoop\pkg_config"
+          echo $pkg_config_path
     
       - name: Prepare compiler cache
         id: prep-ccache
@@ -163,9 +180,19 @@ jobs:
       # We need to use static linking, because Mesons setup for MSVC is broken and links against .lib files even though it generated .dlls
       - name: Prepare Build
         run: meson setup build -Ddefault_library=static
+      
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat build/meson-logs/meson-log.txt
 
       - name: Run Build
         run: cd build && meson compile -v
+      
+      - name: Print meson log on failure
+        if: ${{ failure() }}
+        shell: pwsh
+        run: cat build/meson-logs/meson-log.txt
 
       - name: Run Test Suite
         run: cd build && meson test -v

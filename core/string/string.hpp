@@ -7,9 +7,9 @@
 class String {
 	std::string data;
 
-	public:
-	String utf8() const;
-	const char* get_data();
+public:
+	[[nodiscard]] String utf8() const;
+	[[nodiscard]] const char* get_data() const;
 
 	String() noexcept;
 	String(const char* data) noexcept;
